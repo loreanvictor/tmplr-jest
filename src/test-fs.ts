@@ -3,11 +3,15 @@ import { Volume, IFs, createFsFromVolume } from 'memfs'
 import { join, isAbsolute, dirname, relative, normalize, resolve, basename } from 'path'
 
 
+export type FakeFiles = {[path: string]: string}
+export type FakeRemotes = {[url: string]: FakeFiles}
+
+
 function createTestFSFromVolume(
   _root: string,
   _scope: string,
   volume: IFs,
-  remotes: {[url: string]: {[path: string]: string}},
+  remotes: FakeRemotes,
 ): FileSystem & { volume: IFs } {
   const root = resolve(_root)
   const scope = resolve(_scope)
@@ -44,7 +48,7 @@ function createTestFSFromVolume(
     read: jest.fn(async (path: string) => {
       const abs = absolute(path)
       checkSubPath(abs)
-  
+
       return (await volume.promises.readFile(abs, 'utf8')) as string
     }),
     write: jest.fn(async (path: string, content: string) => {
@@ -70,10 +74,10 @@ function createTestFSFromVolume(
 
       if (remote in remotes) {
         for(const [path, content] of Object.entries(remotes[remote]!)) {
-          const abs = absolute(join(dest, path))
-          checkSubPath(abs)
-          await ensureSubPath(abs)
-          volume.promises.writeFile(abs, content)
+          const _abs = absolute(join(dest, path))
+          checkSubPath(_abs)
+          await ensureSubPath(_abs)
+          volume.promises.writeFile(_abs, content)
         }
       } else {
         throw new Error('Remote not found.')
@@ -82,21 +86,22 @@ function createTestFSFromVolume(
     cd: jest.fn((path: string) => {
       const abs = absolute(path)
       checkSubPath(abs)
-  
+
       return createTestFSFromVolume(abs, scope, volume, remotes)
     })
   }
 }
 
 
-export function createTestFS(
-  options: {
-    root?: string,
-    scope?: string,
-    remotes?: {[url: string]: {[path: string]: string}},
-    files?: {[path: string]: string},
-  } = {}
-) {
+export type TestFSOptions = {
+  files?: FakeFiles
+  remotes?: FakeRemotes
+  root?: string
+  scope?: string
+}
+
+
+export function createTestFS(options: TestFSOptions= {}) {
   return createTestFSFromVolume(
     options.root || '/',
     options.scope || '/',
