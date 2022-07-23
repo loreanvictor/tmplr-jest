@@ -16,7 +16,7 @@ npm i @tmplr/jest --save-dev
 
 You need to have [Jest](https://jestjs.io) installed and setup. Utilities provided by this package are only usable where Jest's globals are registered in the environment.
 
-```tts
+```ts
 import { createTestSetup } from '@tmplr/jest'
 
 
