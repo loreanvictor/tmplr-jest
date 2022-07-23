@@ -102,10 +102,24 @@ export type TestFSOptions = {
 
 
 export function createTestFS(options: TestFSOptions= {}) {
+  const files: FakeFiles = {}
+  const root = options.root || '/'
+  const scope = options.scope || '/'
+
+  if (options.files) {
+    Object.entries(options.files).forEach(([path, content]) => {
+      if (isAbsolute(path)) {
+        files[path] = content
+      } else {
+        files[normalize(join(root, path))] = content
+      }
+    })
+  }
+
   return createTestFSFromVolume(
-    options.root || '/',
-    options.scope || '/',
-    createFsFromVolume(Volume.fromJSON(options.files || {})),
+    root,
+    scope,
+    createFsFromVolume(Volume.fromJSON(files)),
     options.remotes || {}
   )
 }

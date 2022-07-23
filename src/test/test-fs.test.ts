@@ -91,4 +91,15 @@ describe(createTestFS, () => {
     await expect(fs.read('/home/bla/bla/stuff')).resolves.toBe('yellow')
     await expect(fs.read('/home/bla/stuff')).resolves.toBe('blue')
   })
+
+  test('works with relative file addresses.', async () => {
+    const fs = createTestFS({
+      files: {
+        main: 'hola!'
+      }
+    })
+
+    await expect(fs.read('main')).resolves.toBe('hola!')
+    await expect(fs.read('/main')).resolves.toBe('hola!')
+  })
 })
