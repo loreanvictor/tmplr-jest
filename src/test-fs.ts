@@ -38,6 +38,24 @@ function createTestFSFromVolume(
     }
   }
 
+  const ls = async (path: string) => {
+    const abs = absolute(path)
+    checkSubPath(abs)
+
+    const paths: string[] = []
+    await Promise.all(
+      (await volume.promises.readdir(abs)).map(async (name) => {
+        if ((await volume.promises.stat(join(abs, name))).isDirectory()) {
+          paths.push(...(await ls(join(abs, name))).map(p => join(name, p)))
+        } else {
+          paths.push(name)
+        }
+      })
+    )
+
+    return paths
+  }
+
   return {
     volume,
     root,
@@ -45,6 +63,7 @@ function createTestFSFromVolume(
     absolute: jest.fn(absolute),
     basename: jest.fn(basename),
     dirname: jest.fn(dirname),
+    ls: jest.fn(ls),
     read: jest.fn(async (path: string) => {
       const abs = absolute(path)
       checkSubPath(abs)

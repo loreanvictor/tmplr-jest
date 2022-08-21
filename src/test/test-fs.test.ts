@@ -102,4 +102,21 @@ describe(createTestFS, () => {
     await expect(fs.read('main')).resolves.toBe('hola!')
     await expect(fs.read('/main')).resolves.toBe('hola!')
   })
+
+  test('can list all files in a given path.', async () => {
+    const fs = createTestFS({
+      files: {
+        '/home/stuff': 'yellow',
+        '/home/other/bla': 'blue'
+      },
+      root: '/home',
+      scope: '/home',
+    })
+
+    await expect(fs.ls('/home/other')).resolves.toEqual(['bla'])
+    await expect(fs.ls('/home')).resolves.toEqual(['stuff', 'other/bla'])
+
+    await fs.write('/home/blah/foo/bar.txt', 'well ...')
+    await expect(fs.ls('/home')).resolves.toEqual(['stuff', 'other/bla', 'blah/foo/bar.txt'])
+  })
 })
