@@ -18,7 +18,7 @@ describe(createTestSetup, () => {
 
     await new Steps([
       new Read('name', new Eval('{{ stuff.foo | Capital Case }}', context), scope),
-      new Update(new Value('foo.md'), fs, varcontext, log),
+      new Update(new Value('foo.md'), false, fs, varcontext, log),
     ]).run().execute()
 
     await expect(fs.read('foo.md')).resolves.toBe('# Hi Jack!')
