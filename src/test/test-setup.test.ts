@@ -1,4 +1,4 @@
-import { Eval, Read, Steps, Update, Value } from '@tmplr/core'
+import { Eval, Read, Steps, Update, Value, Flow } from '@tmplr/core'
 import { createTestSetup } from '../test-setup'
 
 
@@ -18,8 +18,8 @@ describe(createTestSetup, () => {
 
     await new Steps([
       new Read('name', new Eval('{{ stuff.foo | Capital Case }}', context), scope),
-      new Update(new Value('foo.md'), false, fs, varcontext, log),
-    ]).run().execute()
+      new Update(new Value('foo.md'), fs, varcontext, { log }),
+    ]).run(new Flow()).execute()
 
     await expect(fs.read('foo.md')).resolves.toBe('# Hi Jack!')
   })
@@ -29,7 +29,7 @@ describe(createTestSetup, () => {
 
     await expect(scope.vars.has('_.halo')).resolves.toBe(false)
 
-    await new Read('halo', new Eval('world', context), scope).run().execute()
+    await new Read('halo', new Eval('world', context), scope).run(new Flow()).execute()
 
     await expect(scope.vars.has('_.halo')).resolves.toBe(true)
     await expect(scope.vars.get('_.halo')).resolves.toBe('world')
