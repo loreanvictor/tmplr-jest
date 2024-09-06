@@ -15,6 +15,7 @@ export function createTestSetup(options: TestSetupOptions = {}) {
   const log = new ChangeLog()
   const context = new EvaluationContext(scope, options.pipes || STANDARD_PIPES)
   const varcontext = new EvaluationContext(scope.vars, options.pipes || STANDARD_PIPES)
+  const flow = new Flow({ onKill: jest.fn() })
 
 
   return {
@@ -23,6 +24,6 @@ export function createTestSetup(options: TestSetupOptions = {}) {
     log,
     context,
     varcontext,
-    testflow: () => new Flow({ onKill: jest.fn() }),
+    flow,
   }
 }
