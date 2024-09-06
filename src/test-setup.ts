@@ -1,4 +1,4 @@
-import { ChangeLog, EvaluationContext, PipeMap, PipeRegistry, STANDARD_PIPES } from '@tmplr/core'
+import { ChangeLog, EvaluationContext, Flow, PipeMap, PipeRegistry, STANDARD_PIPES } from '@tmplr/core'
 
 import { createTestFS, TestFSOptions } from './test-fs'
 import { createTestScope, TestScopeOptions } from './test-scope'
@@ -23,5 +23,6 @@ export function createTestSetup(options: TestSetupOptions = {}) {
     log,
     context,
     varcontext,
+    testflow: () => new Flow({ onKill: jest.fn() }),
   }
 }

@@ -1,10 +1,10 @@
-import { Eval, Read, Steps, Update, Value, Flow } from '@tmplr/core'
+import { Eval, Read, Steps, Update, Value } from '@tmplr/core'
 import { createTestSetup } from '../test-setup'
 
 
 describe(createTestSetup, () => {
   test('provides a test setup for testing tmplr stuff.', async () => {
-    const { fs, scope, log, context, varcontext } = createTestSetup({
+    const { fs, scope, log, context, varcontext, testflow } = createTestSetup({
       files: {
         '/foo.md': '# Hi {{ tmplr.name }}!',
       },
@@ -19,17 +19,17 @@ describe(createTestSetup, () => {
     await new Steps([
       new Read('name', new Eval('{{ stuff.foo | Capital Case }}', context), scope),
       new Update(new Value('foo.md'), fs, varcontext, { log }),
-    ]).run(new Flow()).execute()
+    ]).run(testflow()).execute()
 
     await expect(fs.read('foo.md')).resolves.toBe('# Hi Jack!')
   })
 
   test('also creates an empty setup.', async () => {
-    const { scope, context } = createTestSetup()
+    const { scope, context, testflow } = createTestSetup()
 
     await expect(scope.vars.has('_.halo')).resolves.toBe(false)
 
-    await new Read('halo', new Eval('world', context), scope).run(new Flow()).execute()
+    await new Read('halo', new Eval('world', context), scope).run(testflow()).execute()
 
     await expect(scope.vars.has('_.halo')).resolves.toBe(true)
     await expect(scope.vars.get('_.halo')).resolves.toBe('world')
